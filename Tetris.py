@@ -419,172 +419,216 @@ def draw_window(surface, grid, tlx, tly, last_score=str(0)):
 def main(win):
     max_score = _max_score()
     last_score = max_score
-    locked_positions = {}
-    locked_positions2 = {}
+    run = True
 
+    # -------------------------------------------------
+    #  Class Instance 1
+
+    locked_positions = {}
     change_piece = False
     current_piece = get_shape()
     next_piece = get_shape()
-
-    change_piece2 = False
-    current_piece2 = get_shape()
-    next_piece2 = get_shape()
 
     clock = pygame.time.Clock()
     fall_time = 0
     fall_speed = 0.5
     level_time = 0
     score = 0
+    game_over = False
+
+    # -------------------------------------------------
+    # Class Instance 2
+
+    locked_positions2 = {}
+    change_piece2 = False
+    current_piece2 = get_shape()
+    next_piece2 = get_shape()
 
     clock2 = pygame.time.Clock()
     fall_time2 = 0
     fall_speed2 = 0.5
     level_time2 = 0
     score2 = 0
+    game_over2 = False
 
-    run = True
-
+    # -------------------------------------------------
+    # Main Loop
     while run:
+        # -------------------------------------------------
+        # Begin Update Function
+
+        # -------------------------------------------------
+        # Class Instance 1
+
         grid = create_grid(locked_positions)
-        # checks how long while loop has run and adds that
-        fall_time += clock.get_rawtime()
-        level_time += clock.get_rawtime()
-        clock.tick()
+        game_over = check_lost(locked_positions)
+
+        if True:
+            # checks how long while loop has run and adds that
+            fall_time += clock.get_rawtime()
+            level_time += clock.get_rawtime()
+            clock.tick()
+
+            if level_time / 1000 > 5:
+                level_time = 0
+                if fall_speed > 0.12:
+                    fall_speed -= 0.0005
+
+            if fall_time / 1000 > fall_speed:
+                fall_time = 0
+                current_piece.y += 1
+                if not (valid_space(current_piece, grid)) and current_piece.y > 0:
+                    current_piece.y -= 1
+                    # locks the piece in place
+                    change_piece = True
+
+            shape_pos = convert_shape_format(current_piece)
+
+            for i in range(len(shape_pos)):
+                x, y = shape_pos[i]
+                if y > -1:
+                    grid[y][x] = current_piece.color
+
+            if change_piece:
+                for pos in shape_pos:
+                    p = (pos[0], pos[1])
+                    locked_positions[p] = current_piece.color
+                current_piece = next_piece
+                next_piece = get_shape()
+                change_piece = False
+                score += clear_rows(grid, locked_positions) * 10
+
+        # -------------------------------------------------
+        # Class Instance 2
 
         grid2 = create_grid(locked_positions2)
-        # checks how long while loop has run and adds that
-        fall_time2 += clock.get_rawtime()
-        level_time2 += clock.get_rawtime()
-        clock2.tick()
+        game_over2 = check_lost(locked_positions2)
 
-        if level_time / 1000 > 5:
-            level_time = 0
-            if fall_speed > 0.12:
-                fall_speed -= 0.0005
+        if True:
+            # checks how long while loop has run and adds that
+            fall_time2 += clock.get_rawtime()
+            level_time2 += clock.get_rawtime()
+            clock2.tick()
 
-        if level_time2 / 1000 > 5:
-            level_time2 = 0
-            if fall_speed2 > 0.12:
-                fall_speed2 -= 0.0005
+        
+            if level_time2 / 1000 > 5:
+                level_time2 = 0
+                if fall_speed2 > 0.12:
+                    fall_speed2 -= 0.0005
 
-        if fall_time / 1000 > fall_speed:
-            fall_time = 0
-            current_piece.y += 1
-            if not (valid_space(current_piece, grid)) and current_piece.y > 0:
-                current_piece.y -= 1
-                # locks the piece in place
-                change_piece = True
+            if fall_time2 / 1000 > fall_speed2:
+                fall_time2 = 0
+                current_piece2.y += 1
+                if not (valid_space2(current_piece2, grid2)) and current_piece2.y > 0:
+                    current_piece2.y -= 1
+                    # locks the piece in place
+                    change_piece2 = True
 
-        if fall_time2 / 1000 > fall_speed2:
-            fall_time2 = 0
-            current_piece2.y += 1
-            if not (valid_space2(current_piece2, grid2)) and current_piece2.y > 0:
-                current_piece2.y -= 1
-                # locks the piece in place
-                change_piece2 = True
+            for event in pygame.event.get():
+                # Event polling should only be used for window or sigterm events
+                if event.type == pygame.QUIT:
+                    run = False
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    current_piece.x -= 1
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.x += 1
-
-                if event.key == pygame.K_d:
-                    current_piece.x += 1
-                    if not (valid_space(current_piece, grid)):
+                # TODO: refactor all of the player controls
+                # @link https://www.pygame.org/docs/ref/key.html
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_a:
                         current_piece.x -= 1
+                        if not (valid_space(current_piece, grid)):
+                            current_piece.x += 1
 
-                if event.key == pygame.K_s:
-                    current_piece.y += 5
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.y -= 5
+                    if event.key == pygame.K_d:
+                        current_piece.x += 1
+                        if not (valid_space(current_piece, grid)):
+                            current_piece.x -= 1
 
-                if event.key == pygame.K_w:
-                    current_piece.rotation += 1
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.rotation -= 1
+                    if event.key == pygame.K_s:
+                        current_piece.y += 5
+                        if not (valid_space(current_piece, grid)):
+                            current_piece.y -= 5
 
-                if event.key == pygame.K_LEFT:
-                    current_piece2.x -= 1
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.x += 1
+                    if event.key == pygame.K_w:
+                        current_piece.rotation += 1
+                        if not (valid_space(current_piece, grid)):
+                            current_piece.rotation -= 1
 
-                if event.key == pygame.K_RIGHT:
-                    current_piece2.x += 1
-                    if not (valid_space2(current_piece2, grid2)):
+                    if event.key == pygame.K_LEFT:
                         current_piece2.x -= 1
+                        if not (valid_space2(current_piece2, grid2)):
+                            current_piece2.x += 1
 
-                if event.key == pygame.K_DOWN:
-                    current_piece2.y += 5
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.y -= 5
+                    if event.key == pygame.K_RIGHT:
+                        current_piece2.x += 1
+                        if not (valid_space2(current_piece2, grid2)):
+                            current_piece2.x -= 1
 
-                if event.key == pygame.K_UP:
-                    current_piece2.rotation += 1
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.rotation -= 1
+                    if event.key == pygame.K_DOWN:
+                        current_piece2.y += 5
+                        if not (valid_space2(current_piece2, grid2)):
+                            current_piece2.y -= 5
 
-        shape_pos = convert_shape_format(current_piece)
-        shape_pos2 = convert_shape_format(current_piece2)
+                    if event.key == pygame.K_UP:
+                        current_piece2.rotation += 1
+                        if not (valid_space2(current_piece2, grid2)):
+                            current_piece2.rotation -= 1
 
-        for i in range(len(shape_pos)):
-            x, y = shape_pos[i]
-            if y > -1:
-                grid[y][x] = current_piece.color
+            shape_pos2 = convert_shape_format(current_piece2)
 
-        for i in range(len(shape_pos2)):
-            x, y = shape_pos2[i]
-            if y > -1:
-                grid2[y][x] = current_piece2.color
+            for i in range(len(shape_pos2)):
+                x, y = shape_pos2[i]
+                if y > -1:
+                    grid2[y][x] = current_piece2.color
 
-        if change_piece:
-            for pos in shape_pos:
-                p = (pos[0], pos[1])
-                locked_positions[p] = current_piece.color
-            current_piece = next_piece
-            next_piece = get_shape()
-            change_piece = False
-            score += clear_rows(grid, locked_positions) * 10
+            if change_piece2:
+                for pos2 in shape_pos2:
+                    p = (pos2[0], pos2[1])
+                    locked_positions2[p] = current_piece2.color
+                current_piece2 = next_piece2
+                next_piece2 = get_shape()
+                change_piece2 = False
+                score2 += clear_rows2(grid2, locked_positions2) * 10
 
-        if change_piece2:
-            for pos2 in shape_pos2:
-                p = (pos2[0], pos2[1])
-                locked_positions2[p] = current_piece2.color
-            current_piece2 = next_piece2
-            next_piece2 = get_shape()
-            change_piece2 = False
-            score2 += clear_rows2(grid2, locked_positions2) * 10
+
+        # End Update function
+        # -------------------------------------------------
+        # Begin Draw function
 
         win.fill((0, 0, 0))
 
+        # -------------------------------------------------
+        # Class Instance 1
+
         draw_window(win, grid, top_left_x, top_left_y, last_score)
-        draw_window(win, grid2, top_left_x2, top_left_y2, last_score)
-
         draw_scores(win, score)
-        draw_scores2(win, score2)
-
         draw_next_shape(next_piece, win)
-        draw_next_shape2(next_piece2, win)
 
-        pygame.display.update()
-
-        if check_lost(locked_positions):
+        if game_over:
             draw_text_middle(win, "You Lost", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
-            run = False
+            # run = False
             update_score(score)
 
-        if check_lost(locked_positions2):
+        # -------------------------------------------------
+        # Class Instance 2
+
+        draw_window(win, grid2, top_left_x2, top_left_y2, last_score)
+        draw_scores2(win, score2)
+        draw_next_shape2(next_piece2, win)
+
+        if game_over2:
             draw_text_middle2(win, "You Lost", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
-            run = False
+            # run = False
             update_score(score2)
+
+        # -------------------------------------------------
+        # Render Screen
+        pygame.display.update()
+
+        # End Draw fucntion
+
 
 
 window = pygame.display.set_mode((s_width, s_height))
