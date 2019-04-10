@@ -22,6 +22,9 @@ top_left_y = s_height - play_height
 top_left_x2 = (s_width - play_width) // 1.3
 top_left_y2 = s_height - play_height
 
+scores_fn = 'scores.txt' # Highscores save file
+max_score = 0
+
 # SHAPE FORMATS
 
 S = [['.....',
@@ -340,35 +343,24 @@ def draw_next_shape2(shape, surface):
 
 
 def update_score(nscore):
-    with open('scores.txt', 'r') as f:
-        lines = f.readlines()
-        score = lines[0].strip()
-
-    with open('scores.txt', 'w') as f:
-        if int(score) > nscore:
-            f.write(str(score))
-        else:
-            f.write(str(nscore))
+    if nscore > max_score:
+        with open(scores_fn, 'w') as f:
+            f.write(nscore)
 
 
-def update_score2(nscore):
-    with open('scores.txt', 'r') as f:
-        lines = f.readlines()
-        score = lines[0].strip()
 
-    with open('scores.txt', 'w') as f:
-        if int(score) > nscore:
-            f.write(str(score))
-        else:
-            f.write(str(nscore))
+def _max_score():
+    try:
+        with open(scores_fn, 'r') as f:
+            lines = f.readlines()
+            if len(lines) > 0:
+                score = lines[0].strip()
+                return score
+    except IOError:
+        # Create empty file
+        open(scores_fn, 'w').close()
+        return ""
 
-
-def max_score():
-    with open('scores.txt', 'r') as f:
-        lines = f.readlines()
-        score = lines[0].strip()
-
-    return score
 
 
 def draw_scores(surface, score=0):
@@ -425,7 +417,8 @@ def draw_window(surface, grid, tlx, tly, last_score=str(0)):
 
 
 def main(win):
-    last_score = max_score()
+    max_score = _max_score()
+    last_score = max_score
     locked_positions = {}
     locked_positions2 = {}
 
@@ -591,7 +584,7 @@ def main(win):
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
-            update_score2(score2)
+            update_score(score2)
 
 
 window = pygame.display.set_mode((s_width, s_height))
