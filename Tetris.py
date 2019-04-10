@@ -463,7 +463,7 @@ def main(win):
         grid = create_grid(locked_positions)
         game_over = check_lost(locked_positions)
 
-        if True:
+        if not game_over:
             # checks how long while loop has run and adds that
             fall_time += clock.get_rawtime()
             level_time += clock.get_rawtime()
@@ -504,7 +504,7 @@ def main(win):
         grid2 = create_grid(locked_positions2)
         game_over2 = check_lost(locked_positions2)
 
-        if True:
+        if not game_over2:
             # checks how long while loop has run and adds that
             fall_time2 += clock.get_rawtime()
             level_time2 += clock.get_rawtime()
