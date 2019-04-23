@@ -142,6 +142,18 @@ class Piece(object):
         self.rotation = 0
 
 
+class Attributes:
+    def __init__(self, locked_positions, change_piece, current_piece, next_piece, fall_time, fall_speed, level_time, score):
+        self.locked_positions = locked_positions
+        self.change_piece = change_piece
+        self.current_piece = current_piece
+        self.next_piece = next_piece
+        self.fall_time = fall_time
+        self.fall_speed = fall_speed
+        self.level_time = level_time
+        self.score = score
+
+
 def create_grid(locked_positions):
     grid = [[(0, 0, 0) for _ in range(10)] for _ in range(20)]
 
@@ -426,69 +438,52 @@ def draw_window(surface, grid, tlx, tly, last_score=str(0)):
 
 def main(win):
     last_score = max_score()
-    locked_positions = {}
-    locked_positions2 = {}
 
-    change_piece = False
-    current_piece = get_shape()
-    next_piece = get_shape()
-
-    change_piece2 = False
-    current_piece2 = get_shape()
-    next_piece2 = get_shape()
+    piece1 = Attributes({}, False, get_shape(), get_shape(), 0, 0.5, 0, 0)
+    piece2 = Attributes({}, False, get_shape(), get_shape(), 0, 0.5, 0, 0)
 
     clock = pygame.time.Clock()
-    fall_time = 0
-    fall_speed = 0.5
-    level_time = 0
-    score = 0
-
-    clock2 = pygame.time.Clock()
-    fall_time2 = 0
-    fall_speed2 = 0.5
-    level_time2 = 0
-    score2 = 0
 
     run = True
 
     while run:
-        grid = create_grid(locked_positions)
+        grid = create_grid(piece1.locked_positions)
         # checks how long while loop has run and adds that
-        fall_time += clock.get_rawtime()
-        level_time += clock.get_rawtime()
+        piece1.fall_time += clock.get_rawtime()
+        piece1.level_time += clock.get_rawtime()
+
+        grid2 = create_grid(piece2.locked_positions)
+        # checks how long while loop has run and adds that
+        piece2.fall_time += clock.get_rawtime()
+        piece2.level_time += clock.get_rawtime()
+
         clock.tick()
 
-        grid2 = create_grid(locked_positions2)
-        # checks how long while loop has run and adds that
-        fall_time2 += clock.get_rawtime()
-        level_time2 += clock.get_rawtime()
-        clock2.tick()
+        if piece1.level_time / 1000 > 5:
+            piece1.level_time = 0
+            if piece1.fall_speed > 0.12:
+                piece1.fall_speed -= 0.0005
 
-        if level_time / 1000 > 5:
-            level_time = 0
-            if fall_speed > 0.12:
-                fall_speed -= 0.0005
+        if piece2.level_time / 1000 > 5:
+            piece2.level_time = 0
+            if piece2.fall_speed > 0.12:
+                piece2.fall_speed -= 0.0005
 
-        if level_time2 / 1000 > 5:
-            level_time2 = 0
-            if fall_speed2 > 0.12:
-                fall_speed2 -= 0.0005
-
-        if fall_time / 1000 > fall_speed:
-            fall_time = 0
-            current_piece.y += 1
-            if not (valid_space(current_piece, grid)) and current_piece.y > 0:
-                current_piece.y -= 1
+        if piece1.fall_time / 1000 > piece1.fall_speed:
+            piece1.fall_time = 0
+            piece1.current_piece.y += 1
+            if not (valid_space(piece1.current_piece, grid)) and piece1.current_piece.y > 0:
+                piece1.current_piece.y -= 1
                 # locks the piece in place
-                change_piece = True
+                piece1.change_piece = True
 
-        if fall_time2 / 1000 > fall_speed2:
-            fall_time2 = 0
-            current_piece2.y += 1
-            if not (valid_space2(current_piece2, grid2)) and current_piece2.y > 0:
-                current_piece2.y -= 1
+        if piece2.fall_time / 1000 > piece2.fall_speed:
+            piece2.fall_time = 0
+            piece2.current_piece.y += 1
+            if not (valid_space2(piece2.current_piece, grid2)) and piece2.current_piece.y > 0:
+                piece2.current_piece.y -= 1
                 # locks the piece in place
-                change_piece2 = True
+                piece2.change_piece = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -496,102 +491,102 @@ def main(win):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
-                    current_piece.x -= 1
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.x += 1
+                    piece1.current_piece.x -= 1
+                    if not (valid_space(piece1.current_piece, grid)):
+                        piece1.current_piece.x += 1
 
                 if event.key == pygame.K_d:
-                    current_piece.x += 1
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.x -= 1
+                    piece1.current_piece.x += 1
+                    if not (valid_space(piece1.current_piece, grid)):
+                        piece1.current_piece.x -= 1
 
                 if event.key == pygame.K_s:
-                    current_piece.y += 5
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.y -= 5
+                    piece1.current_piece.y += 5
+                    if not (valid_space(piece1.current_piece, grid)):
+                        piece1.current_piece.y -= 5
 
                 if event.key == pygame.K_w:
-                    current_piece.rotation += 1
-                    if not (valid_space(current_piece, grid)):
-                        current_piece.rotation -= 1
+                    piece1.current_piece.rotation += 1
+                    if not (valid_space(piece1.current_piece, grid)):
+                        piece1.current_piece.rotation -= 1
 
                 if event.key == pygame.K_LEFT:
-                    current_piece2.x -= 1
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.x += 1
+                    piece2.current_piece.x -= 1
+                    if not (valid_space2(piece2.current_piece, grid2)):
+                        piece2.current_piece.x += 1
 
                 if event.key == pygame.K_RIGHT:
-                    current_piece2.x += 1
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.x -= 1
+                    piece2.current_piece.x += 1
+                    if not (valid_space2(piece2.current_piece, grid2)):
+                        piece2.current_piece.x -= 1
 
                 if event.key == pygame.K_DOWN:
-                    current_piece2.y += 5
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.y -= 5
+                    piece2.current_piece.y += 5
+                    if not (valid_space2(piece2.current_piece, grid2)):
+                        piece2.current_piece.y -= 5
 
                 if event.key == pygame.K_UP:
-                    current_piece2.rotation += 1
-                    if not (valid_space2(current_piece2, grid2)):
-                        current_piece2.rotation -= 1
+                    piece2.current_piece.rotation += 1
+                    if not (valid_space2(piece2.current_piece, grid2)):
+                        piece2.current_piece.rotation -= 1
 
-        shape_pos = convert_shape_format(current_piece)
-        shape_pos2 = convert_shape_format(current_piece2)
+        shape_pos = convert_shape_format(piece1.current_piece)
+        shape_pos2 = convert_shape_format(piece2.current_piece)
 
         for i in range(len(shape_pos)):
             x, y = shape_pos[i]
             if y > -1:
-                grid[y][x] = current_piece.color
+                grid[y][x] = piece1.current_piece.color
 
         for i in range(len(shape_pos2)):
             x, y = shape_pos2[i]
             if y > -1:
-                grid2[y][x] = current_piece2.color
+                grid2[y][x] = piece2.current_piece.color
 
-        if change_piece:
+        if piece1.change_piece:
             for pos in shape_pos:
                 p = (pos[0], pos[1])
-                locked_positions[p] = current_piece.color
-            current_piece = next_piece
-            next_piece = get_shape()
-            change_piece = False
-            score += clear_rows(grid, locked_positions) * 10
+                piece1.locked_positions[p] = piece1.current_piece.color
+            piece1.current_piece = piece1.next_piece
+            piece1.next_piece = get_shape()
+            piece1.change_piece = False
+            piece1.score += clear_rows(grid, piece1.locked_positions) * 10
 
-        if change_piece2:
+        if piece2.change_piece:
             for pos2 in shape_pos2:
                 p = (pos2[0], pos2[1])
-                locked_positions2[p] = current_piece2.color
-            current_piece2 = next_piece2
-            next_piece2 = get_shape()
-            change_piece2 = False
-            score2 += clear_rows2(grid2, locked_positions2) * 10
+                piece2.locked_positions[p] = piece2.current_piece.color
+            piece2.current_piece = piece2.next_piece
+            piece2.next_piece = get_shape()
+            piece2.change_piece = False
+            piece2.score += clear_rows2(grid2, piece2.locked_positions) * 10
 
         win.fill((0, 0, 0))
 
         draw_window(win, grid, top_left_x, top_left_y, last_score)
         draw_window(win, grid2, top_left_x2, top_left_y2, last_score)
 
-        draw_scores(win, score)
-        draw_scores2(win, score2)
+        draw_scores(win, piece1.score)
+        draw_scores2(win, piece2.score)
 
-        draw_next_shape(next_piece, win)
-        draw_next_shape2(next_piece2, win)
+        draw_next_shape(piece1.next_piece, win)
+        draw_next_shape2(piece2.next_piece, win)
 
         pygame.display.update()
 
-        if check_lost(locked_positions):
+        if check_lost(piece1.locked_positions):
             draw_text_middle(win, "You Lost", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
-            update_score(score)
+            update_score(piece1.score)
 
-        if check_lost(locked_positions2):
+        if check_lost(piece2.locked_positions):
             draw_text_middle2(win, "You Lost", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
-            update_score2(score2)
+            update_score2(piece2.score)
 
 
 window = pygame.display.set_mode((s_width, s_height))
