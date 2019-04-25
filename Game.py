@@ -1,11 +1,12 @@
 import pygame
+import sys
 
 from Shape import Shape
 from Player import Player
 
 
-__is_running = False
-__players = []
+is_running = False
+players = []
 
 s_width = 1500
 s_height = 7000
@@ -15,60 +16,52 @@ play_height = 600     # meaning 600 // 20 = 20 height per block
 
 block_size = 30
 
-# top_left_x = (s_width - play_width) // 5
-# top_left_y = s_height - play_height
-
-# top_left_x2 = (s_width - play_width) // 1.3
-# top_left_y2 = s_height - play_height
-
 scores_fn = 'scores.txt'  # Highscores save file
 max_score = 0
 
 
 def run():
-  pygame.font.init()
+  global is_running
+  global players
+  # pygame.font.init()
+  pygame.init()
 
   win = pygame.display.set_mode((s_width, s_height))
   pygame.display.set_caption('Tetris')
 
-  max_score = _max_score()
-  last_score = max_score
+  # max_score = _max_score()
+  # last_score = max_score
 
 
   num_players = 2
-  __players = [Player(id, ((s_width - play_width) // 5 if id ==
+  players = [Player(id, ((s_width - play_width) // 5 if id ==
                                 0 else 1.3, s_height - play_height)) for id in range(num_players)]
 
 
-  __is_running = True
-  while __is_running:
-    # -------------------------------------------------
-      # Begin Update Function
-    for player in __players:
+  is_running = True
+  while is_running:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        stop()
+
+    for player in players:
       player.update()
 
-      # End Update function
-      # -------------------------------------------------
+    win.fill((10, 10, 10))
 
-    # Begin Draw function
-    # NOTE: called once per frame
-    win.fill((0, 0, 0))
-
-    for player in __players:
+    for player in players:
       player.draw(win)
 
+    pygame.display.flip()
 
-    # -------------------------------------------------
-    # Render Screen
-    # NOTE: Called once per frame
-    pygame.display.update()
-
-    # End Draw fucntion
+  pygame.display.quit()
 
 
 
 def stop():
-  __is_running = False
+  global is_running
+  is_running = False
+
 
 
 

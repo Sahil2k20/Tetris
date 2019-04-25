@@ -8,7 +8,7 @@ class Player:
   def __init__(self, id, origin):
     self.__id = id
     self._origin = origin
-    self._grid = None
+    self._grid = []
 
     self.locked_positions = {}
     self.change_piece = False
