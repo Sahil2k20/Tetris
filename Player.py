@@ -86,12 +86,46 @@ class Player:
 
     return inc
 
+  
+  def _input(self):
+    keys = pygame.key.get_pressed()
+    if self.__id == 0:
+      if keys[pygame.K_a]:
+        self.current_piece.x -= 1
+        if not self._valid_space(self.current_piece):
+          self.current_piece.x += 1
+
+      if keys[pygame.K_d]:
+        self.current_piece.x += 1
+        if not self._valid_space(self.current_piece):
+          self.current_piece.x -= 1
+
+      # if keys[pygame.K_s]
+      # if keys[pygame.K_w]
+
+    else: # id == 1
+      if keys[pygame.K_LEFT]:
+        # FIXME: duplicate code
+        self.current_piece.x -= 1
+        if not self._valid_space(self.current_piece):
+          self.current_piece.x += 1
+
+      if keys[pygame.K_RIGHT]:
+        # FIXME: duplicate code
+        self.current_piece.x += 1
+        if not self._valid_space(self.current_piece):
+          self.current_piece.x -= 1
+
+      # if keys[pygame.K_DOWN]
+      # if keys[pygame.K_UP]
 
 
   def update(self):
     self._grid = self._create_grid()
 
     if not self._is_game_over():
+      self._input()
+
       self.fall_time += self.clock.get_rawtime()
       self.level_time += self.clock.get_rawtime()
       self.clock.tick()
