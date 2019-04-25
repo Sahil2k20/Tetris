@@ -119,3 +119,23 @@ class Shape:
   @classmethod
   def get_rand_shape(cls):
     return Shape(5, 0, random.choice(cls.__shapes))
+
+
+  @classmethod
+  def convert_shape_format(cls, shape):
+    positions = []
+    # finds current shape
+    format = shape.shape[shape.rotation % len(shape.shape)]
+
+    for i, line in enumerate(format):
+        row = list(line)
+        for j, column in enumerate(row):
+            # if 0 exists, add that to position
+            if column == '0':
+                positions.append((shape.x + j, shape.y + i))
+
+    for i, pos in enumerate(positions):
+        # fixes offset on screen so it can be displayed better
+        positions[i] = (pos[0] - 2, pos[1] - 4)
+
+    return positions
