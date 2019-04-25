@@ -121,8 +121,8 @@ class Shape:
     return Shape(5, 0, random.choice(cls.__shapes))
 
 
-  @classmethod
-  def convert_shape_format(cls, shape):
+  @staticmethod
+  def convert_shape_format(shape):
     positions = []
     # finds current shape
     format = shape.shape[shape.rotation % len(shape.shape)]
