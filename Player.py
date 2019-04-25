@@ -133,14 +133,11 @@ class Player:
 
   def draw(self, win):
     self._draw_window(win)
-    # FIXME:
     self._draw_score(win)
     self._draw_next_shape(win)
 
     if self._is_game_over():
       self._draw_text_middle(win, "You Lost", 80, (255, 255, 255))
-      Game.stop()
-      # FIXME:
       # self._update_score(score)
 
 
@@ -190,14 +187,14 @@ class Player:
 
   def _draw_grid(self, surface):
     grid = self._grid
-    sx = 650
-    sy = 20
+    sx, sy = self._origin
     
     for i in range(len(grid)):
-      # draws horizontal lines
-      pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * Game.block_size),
-                       (sx + Game.play_width, sy + i * Game.block_size))
-      for j in range(len(grid[i])):
+      for j in range(len(grid[i]) + 1):
+        # draws horizontal lines
+        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * Game.block_size),
+                        (sx + Game.play_width, sy + i * Game.block_size))
+        
         # draws vertical lines
         pygame.draw.line(surface, (128, 128, 128), (sx + j * Game.block_size,
                                                     sy), (sx + j * Game.block_size, sy + Game.play_height))

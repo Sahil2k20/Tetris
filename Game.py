@@ -9,7 +9,7 @@ is_running = False
 players = []
 
 s_width = 1500
-s_height = 7000
+s_height = 700
 
 play_width = 300     # meaning 300 // 10 = 30 width per block
 play_height = 600     # meaning 600 // 20 = 20 height per block
@@ -23,9 +23,8 @@ max_score = 0
 def run():
   global is_running
   global players
-  # pygame.font.init()
-  pygame.init()
 
+  pygame.init()
   win = pygame.display.set_mode((s_width, s_height))
   pygame.display.set_caption('Tetris')
 
@@ -34,8 +33,9 @@ def run():
 
 
   num_players = 2
-  players = [Player(id, ((s_width - play_width) // 5 if id ==
-                                0 else 1.3, s_height - play_height)) for id in range(num_players)]
+  players = [Player(id, (id * s_width / 2 + play_width, s_height - play_height)) for id in range(num_players)]
+  # players = [Player(id, ((s_width - play_width) // 5 if id ==
+  #                               0 else 1.3, s_height - play_height)) for id in range(num_players)]
 
 
   is_running = True
