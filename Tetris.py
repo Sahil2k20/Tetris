@@ -416,7 +416,11 @@ def draw_window(surface, grid, tlx, tly, last_score=str(0)):
     draw_grid(surface, grid, tlx, tly)
 
 
-def main(win):
+def main():
+    win = pygame.display.set_mode((s_width, s_height))
+    pygame.display.set_caption('Tetris')
+
+
     max_score = _max_score()
     last_score = max_score
     run = True
@@ -631,6 +635,5 @@ def main(win):
 
 
 
-window = pygame.display.set_mode((s_width, s_height))
-pygame.display.set_caption('Tetris')
-main(window)  # start game
+if __name__ == "__main__":
+    main()
