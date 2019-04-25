@@ -1,14 +1,14 @@
 import pygame
 
 from Shape import Shape
-from Game import Game
+import Game
 
 class Player: 
   
   def __init__(self, id, origin):
     self.__id = id
     self._origin = origin
-    self._grid = self._create_grid()
+    self._grid = None
 
     self.locked_positions = {}
     self.change_piece = False
@@ -167,8 +167,7 @@ class Player:
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j],
-                             (tlx + j * Game.block_size, tly + i * Game.block_size, Game.block_size, Game.block_size), 0)
+            pygame.draw.rect(surface, grid[i][j], (tlx + j * Game.block_size, tly + i * Game.block_size, Game.block_size, Game.block_size), 0)
 
     pygame.draw.rect(surface, (255, 0, 0),
                      (tlx, tly, Game.play_width, Game.play_height), 5)
